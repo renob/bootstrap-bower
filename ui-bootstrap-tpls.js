@@ -2541,6 +2541,11 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             // Set up the correct scope
             tooltipCtrl.scope = scope.$parent;
 
+            // workaround for non-cached templates
+            tooltipCtrl['refresh'] = function () {
+                positionTooltip();
+            };
+
             // By default, the tooltip is not open.
             // TODO add ability to start tooltip opened
             scope.isOpen = false;
@@ -2598,7 +2603,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
               // Set the initial positioning.
               tooltip.css({ top: 0, left: 0, display: 'block' });
 
-              // Now we add it to the DOM because need some info about it. But it's not 
+              // Now we add it to the DOM because need some info about it. But it's not
               // visible yet anyway.
               if ( appendToBody ) {
                   $document.find( 'body' ).append( tooltip );
@@ -2626,7 +2631,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
               $timeout.cancel( popupTimeout );
               popupTimeout = null;
 
-              // And now we remove it from the DOM. However, if we have animation, we 
+              // And now we remove it from the DOM. However, if we have animation, we
               // need to wait for it to expire beforehand.
               // FIXME: this is a placeholder for a port of the transitions library.
               if ( scope.animation ) {
@@ -2750,6 +2755,7 @@ function ($http ,  $compile ,  $templateCache) {
         .then(function (response) {
           elem.html(response.data);
           $compile(elem.contents())(transcludeScope);
+          scope.tooltipCtrl.refresh();
         });
 
         // Manual destruction because the transclude isn't a descendent of the
@@ -3688,7 +3694,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //we need to propagate user's query so we can higlight matches
       scope.query = undefined;
 
-      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later 
+      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later
       var timeoutPromise;
 
       var scheduleSearchWithTimeout = function(inputValue) {
